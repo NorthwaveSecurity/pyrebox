@@ -28,9 +28,9 @@ CC=gcc
 CPP=g++
 #PYTHON_CFLAGS = -I./pyrebox/ -I/usr/include/python2.7 -I/usr/include/python2.7 -fno-strict-aliasing -DNDEBUG -fwrapv  -fstack-protector --param=ssp-buffer-size=4
 #PYTHON_LIBS = -L/usr/lib/python2.7/config -lpthread -ldl -lutil -lm -lpython2.7 -Wl,-O1 -Wl,-Bsymbolic-functions -Xlinker -export-dynamic
-PYTHON_CFLAGS = -I./pyrebox $(shell python3-config --cflags | sed -r "s/-DNDEBUG//" | sed -r "s/-Wsign-compare//")
-PYTHON_LIBS = $(shell python3-config --ldflags)
-CFLAGS=-Wall -O2 -g -fPIC -MMD -std=c++11 -std=gnu++11 
+PYTHON_CFLAGS = -I./pyrebox $(shell python3-config --cflags | sed -r "s/-DNDEBUG//" | sed -r "s/-Wsign-compare//" | sed -r "s/-Wl,-stack_size,1000000//")
+PYTHON_LIBS = $(shell python3-config --ldflags | sed -r "s/-Wl,-stack_size,1000000//") -L/Users/nw/.pyenv/versions/3.6.15/lib -v
+CFLAGS=-Wall -O2 -g -fPIC -MMD -std=c++11 -std=gnu++11
 CFLAGS+=$(PYTHON_CFLAGS)
 LDFLAGS=-g -shared 
 LDFLAGS+=$(PYTHON_LIBS)
@@ -72,12 +72,13 @@ documentation:
 #We place these 2 rules so that we can compile more comfortably from this directory
 all: 
 	echo $(PYTHON_CFLAGS)
+	echo $(PYTHON_LIBS)
 	rm -f pyrebox-i386
 	rm -f pyrebox-x86_64
 	cp -f .pyrebox-i386 pyrebox-i386
 	cp -f .pyrebox-x86_64 pyrebox-x86_64
 	@[ ! -f ./sleuthkit/Makefile ] && ./build.sh --reconfigure || true
-	@$(MAKE) -C ./qemu $@
+	@$(MAKE) LDFLAGS="$(LDFLAGS)" -C ./qemu $@
 
 clean: clean-triggers clean-sleuthkit	
 	@$(MAKE) -C ./qemu $@

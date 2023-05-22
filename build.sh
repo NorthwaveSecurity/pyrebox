@@ -118,7 +118,7 @@ fi
 echo -e "${GREEN}\n[*] Building The Sleuth Kit...${NC}\n"
 cd $sleuthkit_path
 make -j${jobs}
-if ! [ -f $sleuthkit_path/tsk/.libs/libtsk.so ]; then
+if ! [ -f $sleuthkit_path/tsk/.libs/libtsk.so ] && ! [ -f $sleuthkit_path/tsk/.libs/libtsk.dylib ]; then
     echo -e "${RED}\n[!] Oops... build failed!${NC}\n"
     exit 1
 fi
